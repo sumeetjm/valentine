@@ -20,10 +20,12 @@
       border-radius: 20px;
       max-width: 420px;
       box-shadow: 0 0 25px rgba(0,0,0,0.2);
+      transition: all 0.5s ease;
     }
 
-    h1, h2 {
-      margin-bottom: 15px;
+    .fade-out {
+      opacity: 0;
+      transform: translateY(20px);
     }
 
     .option {
@@ -48,11 +50,6 @@
       transition: 0.3s;
     }
 
-    #noBtn {
-      font-size: 16px;
-      padding: 12px 22px;
-    }
-
     .heart {
       position: fixed;
       bottom: -20px;
@@ -72,6 +69,44 @@
       left: 0;
       pointer-events: none;
     }
+
+    /* Custom Alert */
+    #customAlert {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .alert-box {
+      background: white;
+      color: #ff4d6d;
+      padding: 25px;
+      border-radius: 18px;
+      max-width: 300px;
+      text-align: center;
+      animation: pop 0.3s ease;
+    }
+
+    .alert-box button {
+      margin-top: 15px;
+      background: #ff4d6d;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    @keyframes pop {
+      from { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -88,23 +123,22 @@
   <div id="options"></div>
 </div>
 
+<!-- Custom Alert -->
+<div id="customAlert">
+  <div class="alert-box">
+    <div id="alertText"></div>
+    <button onclick="closeAlert()">OK 💖</button>
+  </div>
+</div>
+
 <script>
 const questions = [
-  {
-    q: "Where did we hold hands first? 🤝❤️",
-    options: ["Goregaon", "Malad", "Dombivli", "Seawoods"],
-    correct: 2
-  },
-  {
-    q: "What was I wearing when I came to your home first time? 🏠❤️",
-    options: ["Grey shirt", "White shirt", "Blue shirt", "Black shirt"],
-    correct: 1
-  },
-  {
-    q: "When did we kiss first? 💋❤️",
-    options: ["26 July 2025", "24 June 2025", "24 July 2025", "11 April 2025"],
-    correct: 2
-  }
+  { q: "Where did we hold hands first? 🤝❤️",
+    options: ["Goregaon", "Malad", "Dombivli", "Seawoods"], correct: 2 },
+  { q: "What was I wearing when I came to your home first time? 🏠❤️",
+    options: ["Grey shirt", "White shirt", "Blue shirt", "Black shirt"], correct: 1 },
+  { q: "When did we kiss first? 💋❤️",
+    options: ["26 July 2025", "24 June 2025", "24 July 2025", "11 April 2025"], correct: 2 }
 ];
 
 let current = 0;
@@ -113,33 +147,48 @@ const qEl = document.getElementById("question");
 const optEl = document.getElementById("options");
 const card = document.getElementById("gameCard");
 
-function loadQuestion() {
-  const q = questions[current];
-  qEl.innerText = q.q;
-  optEl.innerHTML = "";
+/* Custom Alert */
+function showAlert(msg) {
+  document.getElementById("alertText").innerText = msg;
+  document.getElementById("customAlert").style.display = "flex";
+}
+function closeAlert() {
+  document.getElementById("customAlert").style.display = "none";
+}
 
-  q.options.forEach((opt, i) => {
-    const btn = document.createElement("button");
-    btn.className = "option";
-    btn.innerText = opt;
-    btn.onclick = () => checkAnswer(i);
-    optEl.appendChild(btn);
-  });
+/* Load Question */
+function loadQuestion() {
+  card.classList.add("fade-out");
+  setTimeout(() => {
+    const q = questions[current];
+    qEl.innerText = q.q;
+    optEl.innerHTML = "";
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement("button");
+      btn.className = "option";
+      btn.innerText = opt;
+      btn.onclick = () => checkAnswer(i);
+      optEl.appendChild(btn);
+    });
+    card.classList.remove("fade-out");
+  }, 400);
 }
 
 function checkAnswer(i) {
   if (i === questions[current].correct) {
+    burstConfetti();
     current++;
     if (current < questions.length) {
-      loadQuestion();
+      setTimeout(loadQuestion, 600);
     } else {
-      startValentineTrap();
+      setTimeout(startValentineTrap, 800);
     }
   } else {
-    alert("Oops 😜 Try again, jaan ❤️");
+    showAlert("Oops 😜 Try again, jaan ❤️");
   }
 }
 
+/* Valentine Trap */
 function startValentineTrap() {
   card.innerHTML = `
     <h1>Final Question 💖</h1>
@@ -149,76 +198,110 @@ function startValentineTrap() {
   `;
 
   let yesSize = 18;
+  let noSize = 16;
+
   const yesBtn = document.getElementById("yesBtn");
   const noBtn = document.getElementById("noBtn");
 
   noBtn.onclick = () => {
-    alert("Are you sure? 😏💔");
-    yesSize += 8;
+    showAlert("Are you sure? 😏💔 Think again baby 😘");
+
+    // YES grows FAST
+    yesSize += 20;
     yesBtn.style.fontSize = yesSize + "px";
-    yesBtn.style.padding = (14 + yesSize/4) + "px " + (28 + yesSize/2) + "px";
+    yesBtn.style.padding =
+      (14 + yesSize/3) + "px " + (28 + yesSize/1.5) + "px";
+
+    // NO shrinks
+    noSize -= 3;
+    noBtn.style.fontSize = Math.max(noSize, 8) + "px";
+    noBtn.style.padding =
+      Math.max(6, noSize/2) + "px " + Math.max(10, noSize) + "px";
   };
 
-  yesBtn.onclick = () => {
-    showWinScreen();
-  };
+  yesBtn.onclick = showWinScreen;
 }
 
+/* Win Screen */
 function showWinScreen() {
   card.innerHTML = `
     <h1>YAYYYYY!!! 🎉💖</h1>
     <h2>You are officially my Valentine 😘💍</h2>
     <h2>I LOVE YOU ❤️❤️❤️</h2>
   `;
-  startConfetti();
+  startConfettiRain();
   startHearts();
 }
 
 /* Confetti */
 const canvas = document.getElementById("confetti");
 const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
+canvas.width = innerWidth;
+canvas.height = innerHeight;
 let confetti = [];
 
-function startConfetti() {
-  for (let i = 0; i < 150; i++) {
+function burstConfetti() {
+  for (let i = 0; i < 80; i++) {
     confetti.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height - canvas.height,
-      r: Math.random() * 6 + 4,
-      d: Math.random() * 5 + 5
+      x: canvas.width/2, y: canvas.height/2,
+      r: Math.random()*5+3,
+      dx:(Math.random()-0.5)*10,
+      dy:(Math.random()-0.5)*10,
+      life:60
     });
   }
-  requestAnimationFrame(drawConfetti);
+  requestAnimationFrame(drawBurst);
 }
 
-function drawConfetti() {
+function drawBurst() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  confetti = confetti.filter(c => c.life-- > 0);
+  confetti.forEach(c => {
+    ctx.beginPath();
+    ctx.arc(c.x,c.y,c.r,0,Math.PI*2);
+    ctx.fillStyle="pink";
+    ctx.fill();
+    c.x+=c.dx; c.y+=c.dy; c.dy+=0.3;
+  });
+  if(confetti.length) requestAnimationFrame(drawBurst);
+}
+
+function startConfettiRain() {
+  for (let i = 0; i < 200; i++) {
+    confetti.push({
+      x: Math.random()*canvas.width,
+      y: -Math.random()*canvas.height,
+      r: Math.random()*6+4,
+      dx:0, dy:Math.random()*4+4, life:9999
+    });
+  }
+  requestAnimationFrame(drawRain);
+}
+
+function drawRain() {
   ctx.clearRect(0,0,canvas.width,canvas.height);
   confetti.forEach(c => {
     ctx.beginPath();
-    ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
-    ctx.fillStyle = "pink";
+    ctx.arc(c.x,c.y,c.r,0,Math.PI*2);
+    ctx.fillStyle="pink";
     ctx.fill();
-    c.y += c.d;
-    if (c.y > canvas.height) c.y = -10;
+    c.y+=c.dy;
+    if(c.y>canvas.height) c.y=-10;
   });
-  requestAnimationFrame(drawConfetti);
+  requestAnimationFrame(drawRain);
 }
 
-/* Floating Hearts */
+/* Hearts */
 function startHearts() {
   setInterval(() => {
-    const heart = document.createElement("div");
-    heart.className = "heart";
-    heart.innerText = "❤️";
-    heart.style.left = Math.random() * 100 + "vw";
-    heart.style.animationDuration = (3 + Math.random() * 3) + "s";
-    document.body.appendChild(heart);
-
-    setTimeout(() => heart.remove(), 6000);
-  }, 300);
+    const h=document.createElement("div");
+    h.className="heart";
+    h.innerText="❤️";
+    h.style.left=Math.random()*100+"vw";
+    h.style.animationDuration=(3+Math.random()*3)+"s";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),6000);
+  },250);
 }
 
 loadQuestion();
