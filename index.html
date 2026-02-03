@@ -1,208 +1,227 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-  <title>KBC Valentine Special 💰❤️</title>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <title>For My Valentine ❤️</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: radial-gradient(circle, #050b3a, #000);
-      color: #fff;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #ff758c, #ff7eb3);
+      color: white;
       text-align: center;
-      padding: 20px;
+      overflow-x: hidden;
     }
+
     .card {
-      background: #0b1a6b;
-      max-width: 450px;
-      margin: auto;
-      padding: 20px;
-      border-radius: 18px;
-      box-shadow: 0 0 30px rgba(0,120,255,0.6);
-      border: 2px solid #ffd700;
+      background: rgba(255,255,255,0.15);
+      margin: 40px auto;
+      padding: 25px;
+      border-radius: 20px;
+      max-width: 420px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.2);
     }
-    h2 { color: #ffd700; }
-    input, button {
-      padding: 12px;
-      margin: 8px;
-      width: 90%;
-      border-radius: 10px;
-      border: none;
-      font-size: 15px;
+
+    h1, h2 {
+      margin-bottom: 15px;
     }
-    button {
-      background: linear-gradient(135deg, #ffd700, #ffb700);
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    button:hover { background: #ffcc00; }
-    .hidden { display: none; }
 
     .option {
-      background: #12247a;
-      border: 1px solid #ffd700;
-      margin: 6px 0;
+      background: white;
+      color: #ff4d6d;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      margin: 8px;
+      font-size: 16px;
       cursor: pointer;
-    }
-    .option:hover { background: #1a34aa; }
-
-    .money {
-      color: #00ffcc;
-      font-size: 20px;
-      margin-bottom: 10px;
-      font-weight: bold;
+      transition: 0.2s;
     }
 
-    .lifeline {
-      background: #ff4d6d;
-      color: #fff;
-      margin-top: 10px;
+    .option:hover {
+      transform: scale(1.05);
+    }
+
+    #yesBtn {
+      font-size: 18px;
+      padding: 14px 28px;
+      transition: 0.3s;
+    }
+
+    #noBtn {
+      font-size: 16px;
+      padding: 12px 22px;
+    }
+
+    .heart {
+      position: fixed;
+      bottom: -20px;
+      font-size: 22px;
+      animation: floatUp 5s linear infinite;
+      opacity: 0.8;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-110vh); opacity: 0; }
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
 
-<div class="card" id="step1">
-  <h2>💰 KBC Valentine Special ❤️</h2>
-  <p>Host ka naam daaliye:</p>
-  <input type="text" id="yourName" placeholder="Your Name" />
-  <button onclick="generateLink()">Generate KBC Valentine Link</button>
-  <p id="linkArea"></p>
-</div>
+<audio autoplay loop>
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_9f45c9b1d2.mp3?filename=romantic-ambient-112191.mp3" type="audio/mpeg">
+</audio>
 
-<div class="card hidden" id="step2">
-  <h2 id="welcomeText"></h2>
-  <div class="money" id="moneyText">₹ 1,000</div>
-  <p id="questionText"></p>
+<canvas id="confetti"></canvas>
 
-  <button class="option" onclick="selectOption(0)" id="opt0"></button>
-  <button class="option" onclick="selectOption(1)" id="opt1"></button>
-  <button class="option" onclick="selectOption(2)" id="opt2"></button>
-  <button class="option" onclick="selectOption(3)" id="opt3"></button>
-
-  <button class="lifeline" onclick="useLifeline()">📞 Lifeline (Romantic Hint)</button>
-</div>
-
-<div class="card hidden" id="result">
-  <h2>🎉 Final Result ❤️</h2>
-  <p id="resultText"></p>
+<div class="card" id="gameCard">
+  <h1>Hey Love ❤️</h1>
+  <h2 id="question"></h2>
+  <div id="options"></div>
 </div>
 
 <script>
-  const levels = [
-    { money: "₹ 1,000", 
-      q: "Where did we hold hands first? 🤝❤️",
-      options: ["Goregaon", "Malad", "Dombivli", "Seawoods"],
-      correct: 0
-    },
-    { money: "₹ 10,000", 
-      q: "What was I wearing when I came to your home first time? 🏠❤️",
-      options: ["Grey shirt", "White shirt", "Blue shirt", "Black shirt"],
-      correct: 0
-    },
-    { money: "₹ 1,00,000", 
-      q: "When did we kiss first? 💋❤️",
-      options: ["26 July 2025", "24 June 2025", "24 July 2025", "11 April 2025"],
-      correct: 0
-    },
-    { money: "₹ 7 CRORE 💰", 
-      q: "Final Question ❤️: Will you be my Valentine forever? 💍💖",
-      options: ["Yes ❤️", "Always 😍", "Forever 💕", "All of these 😘"],
-      correct: 3
-    }
-  ];
-
-  let current = 0;
-  let creatorName = "";
-  let lifelineUsed = false;
-
-  function generateLink() {
-    const name = document.getElementById("yourName").value.trim();
-    if (!name) {
-      alert("Please enter host name!");
-      return;
-    }
-    const link = window.location.origin + window.location.pathname + "?from=" + encodeURIComponent(name);
-    document.getElementById("linkArea").innerHTML =
-      `Share this link with your Valentine ❤️<br><br>
-       <input type="text" value="${link}" readonly style="width:90%" />`;
+const questions = [
+  {
+    q: "Where did we hold hands first? 🤝❤️",
+    options: ["Goregaon", "Malad", "Dombivli", "Seawoods"],
+    correct: 2
+  },
+  {
+    q: "What was I wearing when I came to your home first time? 🏠❤️",
+    options: ["Grey shirt", "White shirt", "Blue shirt", "Black shirt"],
+    correct: 1
+  },
+  {
+    q: "When did we kiss first? 💋❤️",
+    options: ["26 July 2025", "24 June 2025", "24 July 2025", "11 April 2025"],
+    correct: 2
   }
+];
 
-  function loadGame() {
-    const params = new URLSearchParams(window.location.search);
-    if (params.has("from")) {
-      creatorName = params.get("from");
-      document.getElementById("step1").classList.add("hidden");
-      document.getElementById("step2").classList.remove("hidden");
-      document.getElementById("welcomeText").innerText =
-        "🙏 Namaskar! " + creatorName + " ke KBC Valentine Game mein aapka swagat hai!";
-      showQuestion();
+let current = 0;
+
+const qEl = document.getElementById("question");
+const optEl = document.getElementById("options");
+const card = document.getElementById("gameCard");
+
+function loadQuestion() {
+  const q = questions[current];
+  qEl.innerText = q.q;
+  optEl.innerHTML = "";
+
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.className = "option";
+    btn.innerText = opt;
+    btn.onclick = () => checkAnswer(i);
+    optEl.appendChild(btn);
+  });
+}
+
+function checkAnswer(i) {
+  if (i === questions[current].correct) {
+    current++;
+    if (current < questions.length) {
+      loadQuestion();
+    } else {
+      startValentineTrap();
     }
+  } else {
+    alert("Oops 😜 Try again, jaan ❤️");
   }
+}
 
-  function showQuestion() {
-    lifelineUsed = false;
-    const lvl = levels[current];
-    document.getElementById("moneyText").innerText = lvl.money;
-    document.getElementById("questionText").innerText = lvl.q;
+function startValentineTrap() {
+  card.innerHTML = `
+    <h1>Final Question 💖</h1>
+    <h2>Will you be my Valentine? 🥹❤️</h2>
+    <button class="option" id="yesBtn">YES 😍</button>
+    <button class="option" id="noBtn">NO 🙈</button>
+  `;
 
-    lvl.options.forEach((opt, i) => {
-      const btn = document.getElementById("opt" + i);
-      btn.innerText = opt;
-      btn.disabled = false;
-      btn.style.opacity = "1";
+  let yesSize = 18;
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn = document.getElementById("noBtn");
+
+  noBtn.onclick = () => {
+    alert("Are you sure? 😏💔");
+    yesSize += 8;
+    yesBtn.style.fontSize = yesSize + "px";
+    yesBtn.style.padding = (14 + yesSize/4) + "px " + (28 + yesSize/2) + "px";
+  };
+
+  yesBtn.onclick = () => {
+    showWinScreen();
+  };
+}
+
+function showWinScreen() {
+  card.innerHTML = `
+    <h1>YAYYYYY!!! 🎉💖</h1>
+    <h2>You are officially my Valentine 😘💍</h2>
+    <h2>I LOVE YOU ❤️❤️❤️</h2>
+  `;
+  startConfetti();
+  startHearts();
+}
+
+/* Confetti */
+const canvas = document.getElementById("confetti");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let confetti = [];
+
+function startConfetti() {
+  for (let i = 0; i < 150; i++) {
+    confetti.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      r: Math.random() * 6 + 4,
+      d: Math.random() * 5 + 5
     });
   }
+  requestAnimationFrame(drawConfetti);
+}
 
-  function selectOption(i) {
-    const lvl = levels[current];
-    if (i === lvl.correct) {
-      current++;
-      if (current < levels.length) {
-        setTimeout(showQuestion, 600);
-      } else {
-        showResult(true);
-      }
-    } else {
-      showResult(false);
-    }
-  }
+function drawConfetti() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  confetti.forEach(c => {
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+    ctx.fillStyle = "pink";
+    ctx.fill();
+    c.y += c.d;
+    if (c.y > canvas.height) c.y = -10;
+  });
+  requestAnimationFrame(drawConfetti);
+}
 
-  function useLifeline() {
-    if (lifelineUsed) {
-      alert("Lifeline already used for this question!");
-      return;
-    }
-    lifelineUsed = true;
+/* Floating Hearts */
+function startHearts() {
+  setInterval(() => {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.innerText = "❤️";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.animationDuration = (3 + Math.random() * 3) + "s";
+    document.body.appendChild(heart);
 
-    // Disable two wrong options
-    const lvl = levels[current];
-    let removed = 0;
-    for (let i = 0; i < 4 && removed < 2; i++) {
-      if (i !== lvl.correct) {
-        document.getElementById("opt" + i).disabled = true;
-        document.getElementById("opt" + i).style.opacity = "0.4";
-        removed++;
-      }
-    }
-    alert("💡 Hint: Dil ki awaaz suno... sahi jawab saamne hai ❤️");
-  }
+    setTimeout(() => heart.remove(), 6000);
+  }, 300);
+}
 
-  function showResult(won) {
-    document.getElementById("step2").classList.add("hidden");
-    document.getElementById("result").classList.remove("hidden");
-
-    if (won) {
-      document.getElementById("resultText").innerText =
-        `🎉 Mubarak ho! Aapne ${creatorName} ka dil jeet liya! ❤️💰\n\nFinal Answer: You are their Valentine forever! 😍💖`;
-    } else {
-      document.getElementById("resultText").innerText =
-        `😅 Galat jawab! Lekin ${creatorName} phir bhi aapko dil se chahta/chahti hai ❤️\n\nTry again — love never gives up! 💕`;
-    }
-  }
-
-  loadGame();
+loadQuestion();
 </script>
 
 </body>
