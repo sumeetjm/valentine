@@ -16,39 +16,46 @@ body{
     justify-content:center;
     align-items:center;
     min-height:100vh;
-    padding:15px;
 }
 
 .quiz-box{
     width:100%;
-    max-width:450px;
+    max-width:500px;
     background:#fff0f5;
-    padding:25px;
+    padding:40px 30px;
     border-radius:20px;
-    box-shadow:0 20px 60px rgba(255,105,180,0.3);
+    box-shadow:0 25px 80px rgba(255,105,180,0.3);
     text-align:center;
     border:2px solid #ffb6c1;
 }
 
 .title{
     color:#d63384;
+    font-size:26px;
 }
 
 .subtitle{
-    font-size:13px;
+    font-size:14px;
     color:#a61e4d;
-    margin-bottom:20px;
+    margin-bottom:25px;
     font-style:italic;
 }
 
+.button-container{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-height:150px;
+}
+
 button{
-    display:block;
-    width:180px;
-    margin:10px auto;
-    padding:12px;
+    width:200px;
+    padding:14px;
+    margin:10px;
     border:none;
-    border-radius:10px;
-    font-size:16px;
+    border-radius:12px;
+    font-size:18px;
     cursor:pointer;
     background:#e91e63;
     color:white;
@@ -61,27 +68,27 @@ button:hover{
 
 .custom-alert{
     position:fixed;
-    bottom:30px;
+    bottom:40px;
     left:50%;
     transform:translateX(-50%);
     background:#ff69b4;
     color:white;
-    padding:12px 20px;
-    border-radius:20px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.2);
-    font-size:14px;
+    padding:14px 25px;
+    border-radius:30px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+    font-size:15px;
     opacity:0;
     transition:all .4s ease;
 }
 
 .custom-alert.show{
     opacity:1;
-    bottom:50px;
+    bottom:70px;
 }
 
 .result-box{
-    font-size:18px;
-    line-height:1.6;
+    font-size:20px;
+    line-height:1.7;
     color:#d63384;
 }
 </style>
@@ -93,7 +100,7 @@ button:hover{
     <h2 class="title">❤️ Love Memory Test</h2>
     <div class="subtitle">Only true love passes all questions 💕</div>
     <h3 id="question"></h3>
-    <div id="answers"></div>
+    <div id="answers" class="button-container"></div>
 </div>
 
 <div class="custom-alert" id="customAlert"></div>
@@ -122,8 +129,8 @@ const questions = [
 ];
 
 let current = 0;
-let yesSize = 16;
-let noSize = 16;
+let yesSize = 18;
+let noSize = 18;
 let noClickCount = 0;
 
 const sureMessages = [
@@ -163,13 +170,11 @@ function loadQuestion(){
 }
 
 function checkAnswer(index){
-    const q = questions[current];
-    if(index === q.correct){
+    if(index === questions[current].correct){
         confetti({
-            particleCount:100,
-            spread:70,
-            origin:{y:0.6},
-            colors:['#ff69b4','#ff85c1','#ffc0cb']
+            particleCount:120,
+            spread:80,
+            origin:{y:0.6}
         });
         current++;
         loadQuestion();
@@ -181,22 +186,23 @@ function checkAnswer(index){
 function noClicked(){
 
     showCustomAlert(sureMessages[noClickCount % sureMessages.length]);
-
     noClickCount++;
 
-    // Increase YES size
-    yesSize += 4;
+    // YES grows (limit size)
+    yesSize += 6;
+    if(yesSize > 48) yesSize = 48;
+
     const yesBtn = document.getElementById("yesBtn");
     yesBtn.style.fontSize = yesSize + "px";
-    yesBtn.style.padding = (12 + noClickCount*3) + "px";
+    yesBtn.style.width = (200 + noClickCount*15) + "px";
 
-    // Decrease NO size
-    noSize -= 2;
-    if(noSize < 10) noSize = 10;
+    // NO shrinks (limit minimum)
+    noSize -= 3;
+    if(noSize < 12) noSize = 12;
 
     const noBtn = document.getElementById("noBtn");
     noBtn.style.fontSize = noSize + "px";
-    noBtn.style.padding = (12 - noClickCount) + "px";
+    noBtn.style.width = (200 - noClickCount*10) + "px";
 }
 
 function showCustomAlert(message){
@@ -212,9 +218,8 @@ function showCustomAlert(message){
 function finalYes(){
 
     confetti({
-        particleCount:250,
-        spread:120,
-        colors:['#ff4d94','#ff69b4','#ffc0cb']
+        particleCount:300,
+        spread:120
     });
 
     document.getElementById("quizBox").innerHTML = `
