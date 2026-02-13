@@ -1,139 +1,233 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Important Question ❤️</title>
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #ffe6f0;
-            font-family: Arial, sans-serif;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Love Consultation ❤️</title>
 
-        .container {
-            position: relative;
-            width: 600px;
-            height: 400px;
-            text-align: center;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            padding-top: 60px;
-        }
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-        h1 {
-            margin-bottom: 50px;
-        }
+<style>
+body{
+    margin:0;
+    font-family:'Georgia', serif;
+    background: linear-gradient(135deg,#ffe6f0,#ffd1dc);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    padding:15px;
+}
 
-        button {
-            padding: 15px 30px;
-            font-size: 18px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-block;
-        }
+.quiz-box{
+    width:100%;
+    max-width:450px;
+    background:#fff0f5;
+    padding:25px;
+    border-radius:20px;
+    box-shadow:0 20px 60px rgba(255,105,180,0.3);
+    text-align:center;
+    border:2px solid #ffb6c1;
+}
 
-        #yesBtn {
-            background: #4CAF50;
-            color: white;
-            transition: transform 0.3s ease;
-        }
+.title{
+    color:#d63384;
+}
 
-        #noBtn {
-            background: #ff4d4d;
-            color: white;
-            position: absolute;
-            left: 55%;
-            top: 55%;
-        }
+.subtitle{
+    font-size:13px;
+    color:#a61e4d;
+    margin-bottom:20px;
+    font-style:italic;
+}
 
-        /* Custom Alert Box */
-        .customAlert {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #fff3cd;
-            padding: 15px 25px;
-            border-radius: 10px;
-            border: 1px solid #ffeeba;
-            display: none;
-            font-weight: bold;
-        }
-    </style>
+button{
+    display:block;
+    width:180px;
+    margin:10px auto;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+    cursor:pointer;
+    background:#e91e63;
+    color:white;
+    transition:all .3s ease;
+}
+
+button:hover{
+    background:#d81b60;
+}
+
+.custom-alert{
+    position:fixed;
+    bottom:30px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#ff69b4;
+    color:white;
+    padding:12px 20px;
+    border-radius:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.2);
+    font-size:14px;
+    opacity:0;
+    transition:all .4s ease;
+}
+
+.custom-alert.show{
+    opacity:1;
+    bottom:50px;
+}
+
+.result-box{
+    font-size:18px;
+    line-height:1.6;
+    color:#d63384;
+}
+</style>
 </head>
+
 <body>
 
-<div class="container" id="container">
-    <h1>Will you marry me? ❤️</h1>
-
-    <button id="yesBtn">Yes 💖</button>
-    <button id="noBtn">No 😢</button>
-
-    <div class="customAlert" id="alertBox"></div>
+<div class="quiz-box" id="quizBox">
+    <h2 class="title">❤️ Love Memory Test</h2>
+    <div class="subtitle">Only true love passes all questions 💕</div>
+    <h3 id="question"></h3>
+    <div id="answers"></div>
 </div>
 
+<div class="custom-alert" id="customAlert"></div>
+
 <script>
-    const yesBtn = document.getElementById("yesBtn");
-    const noBtn = document.getElementById("noBtn");
-    const container = document.getElementById("container");
-    const alertBox = document.getElementById("alertBox");
 
-    let yesScale = 1;
-    let noSize = 120;
+const yourName = "Sumeet";
+const herName = "Natasha";
 
-    const messages = [
-        "Are you really sure? 😟",
-        "Think again… 🥺",
-        "I will be very sad… 💔",
-        "Last chance… 😢",
-        "Please reconsider! ❤️"
-    ];
+const questions = [
+{
+    question: "1. Where did we held hands first time?",
+    answers: ["Seawoods", "Thane", "Dombivli", "Dadar"],
+    correct: 2
+},
+{
+    question: "2. Where did we kissed first?",
+    answers: ["Taxi", "Mall", "Auto", "Road"],
+    correct: 0
+},
+{
+    question: "3. Will you be my Valentine? ❤️",
+    answers: ["Yes", "No"],
+    correct: "trap"
+}
+];
 
-    let messageIndex = 0;
+let current = 0;
+let yesSize = 16;
+let noSize = 16;
+let noClickCount = 0;
 
-    noBtn.addEventListener("click", () => {
+const sureMessages = [
+"Are you sure? 🥺",
+"Really sure? 😢",
+"Think again… 💔",
+"Last chance… 😭",
+"Don’t break my heart 💕",
+"Absolutely sure? 😔",
+"Maybe reconsider? 🥹"
+];
 
-        /* Grow YES in all directions */
-        yesScale += 0.15;
-        yesBtn.style.transform = `scale(${yesScale})`;
+function loadQuestion(){
+    const q = questions[current];
+    document.getElementById("question").innerText = q.question;
+    const answersDiv = document.getElementById("answers");
+    answersDiv.innerHTML = "";
 
-        /* Shrink NO but keep minimum size */
-        if (noSize > 40) {
-            noSize -= 10;
-            noBtn.style.width = noSize + "px";
+    q.answers.forEach((ans,index)=>{
+        const btn = document.createElement("button");
+        btn.innerText = ans;
+
+        if(q.correct === "trap"){
+            if(ans === "Yes"){
+                btn.id="yesBtn";
+                btn.onclick = finalYes;
+            } else {
+                btn.id="noBtn";
+                btn.onclick = noClicked;
+            }
+        } else {
+            btn.onclick = ()=> checkAnswer(index);
         }
 
-        /* Move NO randomly inside container */
-        const maxX = container.clientWidth - noBtn.offsetWidth;
-        const maxY = container.clientHeight - noBtn.offsetHeight;
+        answersDiv.appendChild(btn);
+    });
+}
 
-        const randomX = Math.random() * maxX;
-        const randomY = Math.random() * maxY;
+function checkAnswer(index){
+    const q = questions[current];
+    if(index === q.correct){
+        confetti({
+            particleCount:100,
+            spread:70,
+            origin:{y:0.6},
+            colors:['#ff69b4','#ff85c1','#ffc0cb']
+        });
+        current++;
+        loadQuestion();
+    } else {
+        showCustomAlert("Wrong answer 😜 Try again!");
+    }
+}
 
-        noBtn.style.left = randomX + "px";
-        noBtn.style.top = randomY + "px";
+function noClicked(){
 
-        /* Show Custom Alert */
-        alertBox.innerText = messages[messageIndex];
-        alertBox.style.display = "block";
+    showCustomAlert(sureMessages[noClickCount % sureMessages.length]);
 
-        messageIndex = (messageIndex + 1) % messages.length;
+    noClickCount++;
 
-        setTimeout(() => {
-            alertBox.style.display = "none";
-        }, 1500);
+    // Increase YES size
+    yesSize += 4;
+    const yesBtn = document.getElementById("yesBtn");
+    yesBtn.style.fontSize = yesSize + "px";
+    yesBtn.style.padding = (12 + noClickCount*3) + "px";
+
+    // Decrease NO size
+    noSize -= 2;
+    if(noSize < 10) noSize = 10;
+
+    const noBtn = document.getElementById("noBtn");
+    noBtn.style.fontSize = noSize + "px";
+    noBtn.style.padding = (12 - noClickCount) + "px";
+}
+
+function showCustomAlert(message){
+    const alertBox = document.getElementById("customAlert");
+    alertBox.innerText = message;
+    alertBox.classList.add("show");
+
+    setTimeout(()=>{
+        alertBox.classList.remove("show");
+    },1500);
+}
+
+function finalYes(){
+
+    confetti({
+        particleCount:250,
+        spread:120,
+        colors:['#ff4d94','#ff69b4','#ffc0cb']
     });
 
-    yesBtn.addEventListener("click", () => {
-        alertBox.innerText = "Yayyyyy!!! 💍❤️";
-        alertBox.style.display = "block";
-    });
+    document.getElementById("quizBox").innerHTML = `
+        <div class="result-box">
+        ❤️ <strong>${yourName}</strong> & <strong>${herName}</strong> ❤️ <br><br>
+        Official Status: Forever Valentine 💖 <br><br>
+        "Every love story is beautiful, but ours is my favorite." 💕
+        </div>
+    `;
+}
+
+loadQuestion();
+
 </script>
 
 </body>
