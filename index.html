@@ -45,20 +45,20 @@ body{
 
 button{
     display:block;
-    width:70%;               /* Smaller buttons */
+    width:70%;
     margin:8px auto;
-    padding:10px;            /* Smaller padding */
+    padding:10px;
     border:none;
     border-radius:10px;
-    font-size:14px;          /* Smaller font */
+    font-size:14px;
     cursor:pointer;
-    background:#ff69b4;
+    background:#e91e63;   /* Same for both */
     color:white;
     transition:background .3s ease;
 }
 
 button:hover{
-    background:#ff4d94;
+    background:#d81b60;
 }
 
 .modal{
@@ -91,13 +91,7 @@ button:hover{
     opacity:1;
 }
 
-#yesBtn{
-    background:#e91e63;
-}
-
 #noBtn{
-    background:#ffc0cb;
-    color:#d63384;
     position:absolute;
 }
 
@@ -167,7 +161,6 @@ function loadQuestion(){
 
         if(q.correct === "trap"){
             if(ans === "Yes"){
-                btn.id="yesBtn";
                 btn.onclick = finalYes;
             } else {
                 btn.id="noBtn";
