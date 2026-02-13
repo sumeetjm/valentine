@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ayurvedic Love Consultation 🌿</title>
+<title>Love Consultation ❤️</title>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -11,7 +11,7 @@
 body{
     margin:0;
     font-family: 'Georgia', serif;
-    background: linear-gradient(135deg,#f5f1e8,#e6f0d4);
+    background: linear-gradient(135deg,#ffe6f0,#ffd1dc);
     display:flex;
     justify-content:center;
     align-items:center;
@@ -22,56 +22,43 @@ body{
 
 .quiz-box{
     width:100%;
-    max-width:420px;
-    background:#fffdf7;
+    max-width:450px;
+    background:#fff0f5;
     padding:25px;
     border-radius:20px;
-    box-shadow:0 20px 60px rgba(76,175,80,0.2);
+    box-shadow:0 20px 60px rgba(255,105,180,0.3);
     text-align:center;
-    border:2px solid #c5d8a4;
+    border:2px solid #ffb6c1;
 }
 
 .title{
-    color:#2e7d32;
+    color:#d63384;
     margin-bottom:5px;
 }
 
 .subtitle{
     font-size:13px;
-    color:#777;
+    color:#a61e4d;
     margin-bottom:20px;
     font-style:italic;
 }
 
 button{
     display:block;
-    width:100%;
-    margin:8px 0;
-    padding:10px;              /* smaller buttons */
+    width:70%;               /* Smaller buttons */
+    margin:8px auto;
+    padding:10px;            /* Smaller padding */
     border:none;
     border-radius:10px;
-    font-size:14px;            /* smaller text */
+    font-size:14px;          /* Smaller font */
     cursor:pointer;
-    background:#4caf50;
+    background:#ff69b4;
     color:white;
+    transition:background .3s ease;
 }
 
 button:hover{
-    background:#388e3c;
-}
-
-#yesBtn{
-    width:120px;
-    margin:10px auto;
-    background:#2e7d32;
-}
-
-#noBtn{
-    width:120px;
-    margin:10px auto;
-    background:#a5d6a7;
-    color:#2e7d32;
-    position:absolute;
+    background:#ff4d94;
 }
 
 .modal{
@@ -90,15 +77,13 @@ button:hover{
 }
 
 .modal-card{
-    background:#fffdf7;
+    background:#fff0f5;
     padding:25px;
     border-radius:15px;
     text-align:center;
     width:85%;
     max-width:300px;
-    transform:scale(0.8);
-    transition:.3s ease;
-    border:2px solid #a5c67b;
+    border:2px solid #ffb6c1;
 }
 
 .modal.active{
@@ -106,13 +91,20 @@ button:hover{
     opacity:1;
 }
 
-.modal.active .modal-card{
-    transform:scale(1);
+#yesBtn{
+    background:#e91e63;
+}
+
+#noBtn{
+    background:#ffc0cb;
+    color:#d63384;
+    position:absolute;
 }
 
 .result-box{
     font-size:18px;
     line-height:1.6;
+    color:#d63384;
 }
 </style>
 </head>
@@ -120,16 +112,16 @@ button:hover{
 <body>
 
 <div class="quiz-box" id="quizBox">
-    <h2 class="title">🌿 Ayurvedic Heart Consultation</h2>
-    <div class="subtitle">Truth maintains Hridaya balance</div>
+    <h2 class="title">❤️ Love Heart Checkup</h2>
+    <div class="subtitle">Answer honestly… your heart knows ❤️</div>
     <h3 id="question"></h3>
     <div id="answers"></div>
 </div>
 
 <div class="modal" id="modal">
     <div class="modal-card">
-        <h3>🌿 Correct Diagnosis!</h3>
-        <p>Your heart energy is perfectly aligned.</p>
+        <h3>💖 Correct Answer!</h3>
+        <p>Your love memory is strong 🥰</p>
         <button onclick="closeModal()">Continue</button>
     </div>
 </div>
@@ -155,7 +147,7 @@ const questions = [
     correct: 0
 },
 {
-    question: "3. Will u be my valentine?",
+    question: "3. Will you be my Valentine? ❤️",
     answers: ["Yes", "No"],
     correct: "trap"
 }
@@ -179,7 +171,7 @@ function loadQuestion(){
                 btn.onclick = finalYes;
             } else {
                 btn.id="noBtn";
-                btn.onmouseover = moveNo;
+                btn.onmouseover = dramaticNo;
             }
         } else {
             btn.onclick = ()=> checkAnswer(index);
@@ -196,7 +188,7 @@ function checkAnswer(index){
             particleCount:90,
             spread:70,
             origin:{y:0.6},
-            colors:['#4caf50','#8bc34a','#c5e1a5']
+            colors:['#ff69b4','#ff85c1','#ffc0cb']
         });
         document.getElementById("modal").classList.add("active");
     }
@@ -208,19 +200,14 @@ function closeModal(){
     loadQuestion();
 }
 
-function moveNo(){
+function dramaticNo(){
     const noBtn = document.getElementById("noBtn");
 
-    noBtn.style.position = "absolute";
+    const maxWidth = window.innerWidth - 100;
+    const maxHeight = window.innerHeight - 50;
 
-    const box = document.querySelector(".quiz-box");
-    const boxRect = box.getBoundingClientRect();
-
-    const maxX = boxRect.width - 130;
-    const maxY = boxRect.height - 60;
-
-    const randomX = Math.random() * maxX;
-    const randomY = Math.random() * maxY;
+    const randomX = Math.random() * maxWidth;
+    const randomY = Math.random() * maxHeight;
 
     noBtn.style.left = randomX + "px";
     noBtn.style.top = randomY + "px";
@@ -232,16 +219,14 @@ function finalYes(){
     confetti({
         particleCount:200,
         spread:120,
-        colors:['#2e7d32','#66bb6a','#dcedc8']
+        colors:['#ff4d94','#ff69b4','#ffc0cb']
     });
 
     document.getElementById("quizBox").innerHTML = `
         <div class="result-box">
-        🌿 <strong>${yourName}</strong> & <strong>${herName}</strong> 🌿 <br><br>
-        Diagnosis: Eternal Heart Union Approved 💚 <br><br>
-        <em>हृदयं तव मम चैकं प्रेमसूत्रेण बद्धम् ।</em><br>
-        (Your heart and mine are bound by the thread of love.)<br><br>
-        Our Hridaya is now in perfect balance. 🌿
+        ❤️ <strong>${yourName}</strong> & <strong>${herName}</strong> ❤️ <br><br>
+        Official Status: Forever Valentine 💖 <br><br>
+        "Every love story is beautiful, but ours is my favorite." 💕
         </div>
     `;
 }
