@@ -29,6 +29,7 @@ body{
     box-shadow:0 20px 60px rgba(255,105,180,0.3);
     text-align:center;
     border:2px solid #ffb6c1;
+    position:relative; /* important */
 }
 
 .title{
@@ -45,20 +46,24 @@ body{
 
 button{
     display:block;
-    width:70%;
-    margin:8px auto;
+    width:180px;              /* fixed width for both */
+    margin:10px auto;
     padding:10px;
     border:none;
     border-radius:10px;
     font-size:14px;
     cursor:pointer;
-    background:#e91e63;   /* Same for both */
+    background:#e91e63;
     color:white;
     transition:background .3s ease;
 }
 
 button:hover{
     background:#d81b60;
+}
+
+#noBtn{
+    position:absolute;
 }
 
 .modal{
@@ -89,10 +94,6 @@ button:hover{
 .modal.active{
     visibility:visible;
     opacity:1;
-}
-
-#noBtn{
-    position:absolute;
 }
 
 .result-box{
@@ -164,7 +165,7 @@ function loadQuestion(){
                 btn.onclick = finalYes;
             } else {
                 btn.id="noBtn";
-                btn.onmouseover = dramaticNo;
+                btn.onclick = dramaticNo;   // works on mobile too
             }
         } else {
             btn.onclick = ()=> checkAnswer(index);
@@ -196,8 +197,8 @@ function closeModal(){
 function dramaticNo(){
     const noBtn = document.getElementById("noBtn");
 
-    const maxWidth = window.innerWidth - 100;
-    const maxHeight = window.innerHeight - 50;
+    const maxWidth = window.innerWidth - 200;
+    const maxHeight = window.innerHeight - 200;
 
     const randomX = Math.random() * maxWidth;
     const randomY = Math.random() * maxHeight;
