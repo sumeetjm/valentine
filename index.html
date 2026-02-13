@@ -2,13 +2,14 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Doctor Love Quiz</title>
+<title>Doctor Pink Love Quiz</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
 <style>
 body{
     margin:0;
     font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg,#f5faff,#e3f2fd);
+    background: linear-gradient(135deg,#fff0f6,#ffe4ec);
     display:flex;
     justify-content:center;
     align-items:center;
@@ -16,32 +17,25 @@ body{
     overflow:hidden;
 }
 
-.container{
+.quiz-box{
     width:420px;
     background:white;
     padding:30px;
-    border-radius:20px;
-    box-shadow:0 15px 40px rgba(0,0,0,0.1);
+    border-radius:25px;
+    box-shadow:0 20px 60px rgba(255,105,135,0.25);
     text-align:center;
-    position:relative;
-    transition:opacity .5s ease, transform .5s ease;
+    transition:all .5s ease;
 }
 
-h1{
-    color:#2E86C1;
-    margin-bottom:10px;
+.title{
+    color:#d63384;
+    margin-bottom:5px;
 }
 
-.ecg{
-    height:40px;
-    background:linear-gradient(to right,transparent 0%, #2E86C1 50%, transparent 100%);
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse{
-    0%{opacity:0.3}
-    50%{opacity:1}
-    100%{opacity:0.3}
+.subtitle{
+    font-size:13px;
+    color:#999;
+    margin-bottom:20px;
 }
 
 button{
@@ -50,19 +44,20 @@ button{
     margin:10px 0;
     padding:12px;
     border:none;
-    border-radius:12px;
+    border-radius:15px;
     font-size:16px;
     cursor:pointer;
-    background:#2E86C1;
+    background:#ff4d88;
     color:white;
     transition:all .3s ease;
 }
 
 button:hover{
     transform:scale(1.05);
+    background:#ff3380;
 }
 
-.custom-modal{
+.modal{
     position:fixed;
     top:0;
     left:0;
@@ -74,39 +69,41 @@ button:hover{
     align-items:center;
     visibility:hidden;
     opacity:0;
-    transition:all .3s ease;
+    transition:.3s ease;
 }
 
 .modal-card{
     background:white;
     padding:25px;
-    border-radius:15px;
+    border-radius:20px;
     text-align:center;
     width:300px;
     transform:scale(0.8);
-    transition:all .3s ease;
+    transition:.3s ease;
+    box-shadow:0 10px 40px rgba(255,105,135,0.3);
 }
 
-.custom-modal.active{
+.modal.active{
     visibility:visible;
     opacity:1;
 }
 
-.custom-modal.active .modal-card{
+.modal.active .modal-card{
     transform:scale(1);
 }
 
 .final-buttons{
     position:relative;
-    height:120px;
+    height:130px;
 }
 
 #yesBtn{
-    background:#27AE60;
+    background:#ff0066;
 }
 
 #noBtn{
-    background:#E74C3C;
+    background:#ff99bb;
+    color:#333;
     position:absolute;
     left:0;
 }
@@ -115,93 +112,89 @@ button:hover{
 
 <body>
 
-<div class="container" id="quizBox">
-    <h1>🩺 Love Diagnosis</h1>
-    <div class="ecg"></div>
+<div class="quiz-box" id="quizBox">
+    <h2 class="title">🩺 Pink Heart Consultation</h2>
+    <div class="subtitle">Please answer for accurate love diagnosis</div>
     <h3 id="question"></h3>
     <div id="answers"></div>
 </div>
 
-<div class="custom-modal" id="modal">
+<div class="modal" id="modal">
     <div class="modal-card">
-        <h2>💖 Correct Diagnosis!</h2>
-        <p>Your heart is perfectly healthy.</p>
+        <h3>💖 Correct Diagnosis!</h3>
+        <p>Your heart is responding beautifully.</p>
         <button onclick="closeModal()">Continue</button>
     </div>
 </div>
 
 <script>
-const questions=[
+
+// 🔹 Replace with your questions
+const questions = [
 {
-    question:"What beats faster when I see you?",
-    answers:["Heart","Brain","Liver"],
-    correct:0
+    question: "Your Question 1 Here",
+    answers: ["Option A", "Option B", "Option C"],
+    correct: 0
 },
 {
-    question:"What is the cure for loneliness?",
-    answers:["Medicine","You","Surgery"],
-    correct:1
+    question: "Your Question 2 Here",
+    answers: ["Option A", "Option B", "Option C"],
+    correct: 1
 },
 {
-    question:"Final Diagnosis?",
-    answers:["Love","Forever","Together"],
-    correct:"all"
+    question: "Your Final Question Here",
+    answers: ["Option A", "Option B", "Option C"],
+    correct: "all"
 }
 ];
 
-let current=0;
-let yesScale=1;
-let clickCount=0;
+let current = 0;
+let yesScale = 1;
+let noShrink = 1;
 
 function loadQuestion(){
-    const q=questions[current];
-    document.getElementById("question").innerText=q.question;
-    const answersDiv=document.getElementById("answers");
-    answersDiv.innerHTML="";
+    const q = questions[current];
+    document.getElementById("question").innerText = q.question;
+    const answersDiv = document.getElementById("answers");
+    answersDiv.innerHTML = "";
 
     q.answers.forEach((ans,index)=>{
-        const btn=document.createElement("button");
-        btn.innerText=ans;
-        btn.onclick=()=>checkAnswer(index);
+        const btn = document.createElement("button");
+        btn.innerText = ans;
+        btn.onclick = ()=> checkAnswer(index);
         answersDiv.appendChild(btn);
     });
 }
 
 function checkAnswer(index){
-    const q=questions[current];
+    const q = questions[current];
 
-    if(q.correct==="all" || index===q.correct){
-        launchConfetti();
-        showModal();
+    if(q.correct === "all" || index === q.correct){
+        confetti({
+            particleCount:100,
+            spread:70,
+            origin:{y:0.6},
+            colors:['#ff4d88','#ff99bb','#ffd6e8']
+        });
+        document.getElementById("modal").classList.add("active");
     }
-}
-
-function showModal(){
-    document.getElementById("modal").classList.add("active");
 }
 
 function closeModal(){
     document.getElementById("modal").classList.remove("active");
     current++;
-    if(current<questions.length){
+
+    if(current < questions.length){
         loadQuestion();
-    }else{
+    } else {
         showFinalTrap();
     }
 }
 
-function launchConfetti(){
-    confetti({
-        particleCount:100,
-        spread:70,
-        origin:{y:0.6}
-    });
-}
-
 function showFinalTrap(){
-    const box=document.getElementById("quizBox");
-    box.innerHTML=`
-        <h1>💘 Prescription</h1>
+    const box = document.getElementById("quizBox");
+    box.innerHTML = `
+        <h2 class="title">💘 Final Prescription</h2>
         <h3>Will you be my forever patient?</h3>
         <div class="final-buttons">
             <button id="yesBtn">YES 💖</button>
@@ -209,26 +202,32 @@ function showFinalTrap(){
         </div>
     `;
 
-    const yesBtn=document.getElementById("yesBtn");
-    const noBtn=document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
 
-    yesBtn.onclick=()=>{
-        launchConfetti();
-        box.innerHTML="<h1>💖 Diagnosis: Hopelessly In Love 💖</h1>";
+    yesBtn.onclick = ()=>{
+        confetti({
+            particleCount:180,
+            spread:100,
+            colors:['#ff0066','#ff66a3','#ffcce0']
+        });
+        box.innerHTML = "<h2>💖 Diagnosis: Permanently In Love 💖</h2>";
     };
 
-    noBtn.onmouseover=()=>{
-        clickCount++;
-        yesScale+=0.2;
-        yesBtn.style.transform=`scale(${yesScale})`;
-        noBtn.style.transform=`scale(${1 - clickCount*0.1})`;
-        noBtn.style.left=Math.random()*200+"px";
-        noBtn.style.top=Math.random()*50+"px";
+    noBtn.onmouseover = ()=>{
+        yesScale += 0.35;     // grows faster
+        noShrink -= 0.12;     // shrinks faster
+
+        yesBtn.style.transform = `scale(${yesScale})`;
+        noBtn.style.transform = `scale(${noShrink})`;
+
+        noBtn.style.left = Math.random()*230 + "px";
+        noBtn.style.top = Math.random()*70 + "px";
     };
 }
 
 loadQuestion();
-</script>
 
+</script>
 </body>
 </html>
