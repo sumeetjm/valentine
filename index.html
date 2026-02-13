@@ -186,28 +186,35 @@ function noClicked(){
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
 
-    /* ✅ SCALE YES BUTTON (all directions) */
-    let currentScale = parseFloat(yesBtn.getAttribute("data-scale")) || 1;
-    currentScale += 0.15;
-    yesBtn.style.transform = `scale(${currentScale})`;
+    /* ===== YES SCALE UP ===== */
+    let yesScale = parseFloat(yesBtn.dataset.scale) || 1;
+    yesScale += 0.15;
+    yesBtn.style.transform = `scale(${yesScale})`;
     yesBtn.style.transition = "transform 0.3s ease";
-    yesBtn.setAttribute("data-scale", currentScale);
+    yesBtn.dataset.scale = yesScale;
 
-    /* ✅ SHRINK NO BUTTON (with minimum limit) */
-    noSize -= 2;
-    if(noSize < 10) noSize = 10;
-    noBtn.style.fontSize = noSize + "px";
 
-    /* ✅ MOVE NO BUTTON RANDOMLY */
-    noBtn.style.position = "relative";
+    /* ===== NO SCALE DOWN ===== */
+    let noScale = parseFloat(noBtn.dataset.scale) || 1;
+    noScale -= 0.08;
 
-    const maxX = 120; // horizontal movement range
-    const maxY = 80;  // vertical movement range
+    if(noScale < 0.4) noScale = 0.4;  // minimum size
+
+    noBtn.style.transform = `scale(${noScale})`;
+    noBtn.style.transition = "transform 0.3s ease";
+    noBtn.dataset.scale = noScale;
+
+
+    /* ===== MOVE NO RANDOMLY ===== */
+    const maxX = 120;
+    const maxY = 80;
 
     const randomX = (Math.random() - 0.5) * maxX;
     const randomY = (Math.random() - 0.5) * maxY;
 
-    noBtn.style.transform = `translate(${randomX}px, ${randomY}px)`;
+    noBtn.style.position = "relative";
+    noBtn.style.left = randomX + "px";
+    noBtn.style.top = randomY + "px";
 }
 
 
