@@ -10,7 +10,7 @@
 <style>
 body{
     margin:0;
-    font-family: 'Georgia', serif;
+    font-family:'Georgia', serif;
     background: linear-gradient(135deg,#ffe6f0,#ffd1dc);
     display:flex;
     justify-content:center;
@@ -32,7 +32,6 @@ body{
 
 .title{
     color:#d63384;
-    margin-bottom:5px;
 }
 
 .subtitle{
@@ -60,6 +59,26 @@ button:hover{
     background:#d81b60;
 }
 
+.custom-alert{
+    position:fixed;
+    bottom:30px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#ff69b4;
+    color:white;
+    padding:12px 20px;
+    border-radius:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.2);
+    font-size:14px;
+    opacity:0;
+    transition:all .4s ease;
+}
+
+.custom-alert.show{
+    opacity:1;
+    bottom:50px;
+}
+
 .result-box{
     font-size:18px;
     line-height:1.6;
@@ -76,6 +95,8 @@ button:hover{
     <h3 id="question"></h3>
     <div id="answers"></div>
 </div>
+
+<div class="custom-alert" id="customAlert"></div>
 
 <script>
 
@@ -102,6 +123,7 @@ const questions = [
 
 let current = 0;
 let yesSize = 16;
+let noSize = 16;
 let noClickCount = 0;
 
 const sureMessages = [
@@ -142,7 +164,6 @@ function loadQuestion(){
 
 function checkAnswer(index){
     const q = questions[current];
-
     if(index === q.correct){
         confetti({
             particleCount:100,
@@ -153,21 +174,39 @@ function checkAnswer(index){
         current++;
         loadQuestion();
     } else {
-        alert("Wrong answer 😜 Try again!");
+        showCustomAlert("Wrong answer 😜 Try again!");
     }
 }
 
 function noClicked(){
 
-    alert(sureMessages[noClickCount % sureMessages.length]);
+    showCustomAlert(sureMessages[noClickCount % sureMessages.length]);
 
     noClickCount++;
 
+    // Increase YES size
     yesSize += 4;
-
     const yesBtn = document.getElementById("yesBtn");
     yesBtn.style.fontSize = yesSize + "px";
     yesBtn.style.padding = (12 + noClickCount*3) + "px";
+
+    // Decrease NO size
+    noSize -= 2;
+    if(noSize < 10) noSize = 10;
+
+    const noBtn = document.getElementById("noBtn");
+    noBtn.style.fontSize = noSize + "px";
+    noBtn.style.padding = (12 - noClickCount) + "px";
+}
+
+function showCustomAlert(message){
+    const alertBox = document.getElementById("customAlert");
+    alertBox.innerText = message;
+    alertBox.classList.add("show");
+
+    setTimeout(()=>{
+        alertBox.classList.remove("show");
+    },1500);
 }
 
 function finalYes(){
