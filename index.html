@@ -22,14 +22,13 @@ body{
 
 .quiz-box{
     width:100%;
-    max-width:450px;
+    max-width:420px;
     background:#fffdf7;
     padding:25px;
     border-radius:20px;
     box-shadow:0 20px 60px rgba(76,175,80,0.2);
     text-align:center;
     border:2px solid #c5d8a4;
-    transition:all .5s ease;
 }
 
 .title{
@@ -47,19 +46,32 @@ body{
 button{
     display:block;
     width:100%;
-    margin:10px 0;
-    padding:14px;
+    margin:8px 0;
+    padding:10px;              /* smaller buttons */
     border:none;
-    border-radius:12px;
-    font-size:16px;
+    border-radius:10px;
+    font-size:14px;            /* smaller text */
     cursor:pointer;
     background:#4caf50;
     color:white;
-    transition:all .3s ease;
 }
 
 button:hover{
     background:#388e3c;
+}
+
+#yesBtn{
+    width:120px;
+    margin:10px auto;
+    background:#2e7d32;
+}
+
+#noBtn{
+    width:120px;
+    margin:10px auto;
+    background:#a5d6a7;
+    color:#2e7d32;
+    position:absolute;
 }
 
 .modal{
@@ -98,16 +110,6 @@ button:hover{
     transform:scale(1);
 }
 
-#yesBtn{
-    background:#2e7d32;
-}
-
-#noBtn{
-    background:#a5d6a7;
-    color:#2e7d32;
-    position:absolute;
-}
-
 .result-box{
     font-size:18px;
     line-height:1.6;
@@ -132,14 +134,12 @@ button:hover{
     </div>
 </div>
 
-<!-- Temple Bell Sound -->
 <audio id="bellSound">
 <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3c74c7c0e5.mp3?filename=temple-bell-6927.mp3" type="audio/mpeg">
 </audio>
 
 <script>
 
-// 🔹 EDIT NAMES HERE
 const yourName = "Sumeet";
 const herName = "Natasha";
 
@@ -162,7 +162,6 @@ const questions = [
 ];
 
 let current = 0;
-let yesScale = 1;
 
 function loadQuestion(){
     const q = questions[current];
@@ -180,7 +179,7 @@ function loadQuestion(){
                 btn.onclick = finalYes;
             } else {
                 btn.id="noBtn";
-                btn.onmouseover = dramaticNo;
+                btn.onmouseover = moveNo;
             }
         } else {
             btn.onclick = ()=> checkAnswer(index);
@@ -209,25 +208,23 @@ function closeModal(){
     loadQuestion();
 }
 
-function dramaticNo(){
+function moveNo(){
     const noBtn = document.getElementById("noBtn");
 
     noBtn.style.position = "absolute";
 
-    // Get screen-safe area
-    const maxWidth = window.innerWidth - 120;
-    const maxHeight = window.innerHeight - 60;
+    const box = document.querySelector(".quiz-box");
+    const boxRect = box.getBoundingClientRect();
 
-    const randomX = Math.random() * maxWidth;
-    const randomY = Math.random() * maxHeight;
+    const maxX = boxRect.width - 130;
+    const maxY = boxRect.height - 60;
+
+    const randomX = Math.random() * maxX;
+    const randomY = Math.random() * maxY;
 
     noBtn.style.left = randomX + "px";
     noBtn.style.top = randomY + "px";
-
-    // Optional small playful rotation
-    noBtn.style.transform = `rotate(${Math.random()*30 - 15}deg)`;
 }
-
 
 function finalYes(){
     document.getElementById("bellSound").play();
@@ -242,8 +239,8 @@ function finalYes(){
         <div class="result-box">
         🌿 <strong>${yourName}</strong> & <strong>${herName}</strong> 🌿 <br><br>
         Diagnosis: Eternal Heart Union Approved 💚 <br><br>
-        <em>“स्वस्थस्य स्वास्थ्य रक्षणम् आतुरस्य विकार प्रशमनम्”</em><br>
-        (Preserving the health of the healthy and curing the disease of the ill.)<br><br>
+        <em>हृदयं तव मम चैकं प्रेमसूत्रेण बद्धम् ।</em><br>
+        (Your heart and mine are bound by the thread of love.)<br><br>
         Our Hridaya is now in perfect balance. 🌿
         </div>
     `;
