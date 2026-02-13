@@ -2,59 +2,65 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Doctor Pink Love Quiz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ayurvedic Love Consultation 🌿</title>
+
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
 body{
     margin:0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg,#fff0f6,#ffe4ec);
+    font-family: 'Georgia', serif;
+    background: linear-gradient(135deg,#f5f1e8,#e6f0d4);
     display:flex;
     justify-content:center;
     align-items:center;
-    height:100vh;
+    min-height:100vh;
+    padding:15px;
     overflow:hidden;
 }
 
 .quiz-box{
-    width:420px;
-    background:white;
-    padding:30px;
-    border-radius:25px;
-    box-shadow:0 20px 60px rgba(255,105,135,0.25);
+    width:100%;
+    max-width:450px;
+    background:#fffdf7;
+    padding:25px;
+    border-radius:20px;
+    box-shadow:0 20px 60px rgba(76,175,80,0.2);
     text-align:center;
+    border:2px solid #c5d8a4;
     transition:all .5s ease;
 }
 
 .title{
-    color:#d63384;
+    color:#2e7d32;
     margin-bottom:5px;
 }
 
 .subtitle{
     font-size:13px;
-    color:#999;
+    color:#777;
     margin-bottom:20px;
+    font-style:italic;
 }
 
 button{
     display:block;
     width:100%;
     margin:10px 0;
-    padding:12px;
+    padding:14px;
     border:none;
-    border-radius:15px;
+    border-radius:12px;
     font-size:16px;
     cursor:pointer;
-    background:#ff4d88;
+    background:#4caf50;
     color:white;
     transition:all .3s ease;
 }
 
 button:hover{
     transform:scale(1.05);
-    background:#ff3380;
+    background:#388e3c;
 }
 
 .modal{
@@ -63,7 +69,7 @@ button:hover{
     left:0;
     width:100%;
     height:100%;
-    background:rgba(0,0,0,0.4);
+    background:rgba(0,0,0,0.35);
     display:flex;
     justify-content:center;
     align-items:center;
@@ -73,14 +79,15 @@ button:hover{
 }
 
 .modal-card{
-    background:white;
+    background:#fffdf7;
     padding:25px;
-    border-radius:20px;
+    border-radius:15px;
     text-align:center;
-    width:300px;
+    width:85%;
+    max-width:300px;
     transform:scale(0.8);
     transition:.3s ease;
-    box-shadow:0 10px 40px rgba(255,105,135,0.3);
+    border:2px solid #a5c67b;
 }
 
 .modal.active{
@@ -92,20 +99,19 @@ button:hover{
     transform:scale(1);
 }
 
-.final-buttons{
-    position:relative;
-    height:130px;
-}
-
 #yesBtn{
-    background:#ff0066;
+    background:#2e7d32;
 }
 
 #noBtn{
-    background:#ff99bb;
-    color:#333;
+    background:#a5d6a7;
+    color:#2e7d32;
     position:absolute;
-    left:0;
+}
+
+.result-box{
+    font-size:18px;
+    line-height:1.6;
 }
 </style>
 </head>
@@ -113,44 +119,51 @@ button:hover{
 <body>
 
 <div class="quiz-box" id="quizBox">
-    <h2 class="title">🩺 Pink Heart Consultation</h2>
-    <div class="subtitle">Please answer for accurate love diagnosis</div>
+    <h2 class="title">🌿 Ayurvedic Heart Consultation</h2>
+    <div class="subtitle">Truth maintains Hridaya balance</div>
     <h3 id="question"></h3>
     <div id="answers"></div>
 </div>
 
 <div class="modal" id="modal">
     <div class="modal-card">
-        <h3>💖 Correct Diagnosis!</h3>
-        <p>Your heart is responding beautifully.</p>
+        <h3>🌿 Correct Diagnosis!</h3>
+        <p>Your heart energy is perfectly aligned.</p>
         <button onclick="closeModal()">Continue</button>
     </div>
 </div>
 
+<!-- Temple Bell Sound -->
+<audio id="bellSound">
+<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3c74c7c0e5.mp3?filename=temple-bell-6927.mp3" type="audio/mpeg">
+</audio>
+
 <script>
 
-// 🔹 Replace with your questions
+// 🔹 EDIT NAMES HERE
+const yourName = "Sumeet";
+const herName = "Natasha";
+
 const questions = [
 {
-    question: "Your Question 1 Here",
-    answers: ["Option A", "Option B", "Option C"],
+    question: "1. Where did we held hands first time?",
+    answers: ["Seawoods", "Thane", "Dombivli", "Dadar"],
+    correct: 2
+},
+{
+    question: "2. Where did we kissed first?",
+    answers: ["Taxi", "Mall", "Auto", "Road"],
     correct: 0
 },
 {
-    question: "Your Question 2 Here",
-    answers: ["Option A", "Option B", "Option C"],
-    correct: 1
-},
-{
-    question: "Your Final Question Here",
-    answers: ["Option A", "Option B", "Option C"],
-    correct: "all"
+    question: "3. Will u be my valentine?",
+    answers: ["Yes", "No"],
+    correct: "trap"
 }
 ];
 
 let current = 0;
 let yesScale = 1;
-let noShrink = 1;
 
 function loadQuestion(){
     const q = questions[current];
@@ -161,20 +174,31 @@ function loadQuestion(){
     q.answers.forEach((ans,index)=>{
         const btn = document.createElement("button");
         btn.innerText = ans;
-        btn.onclick = ()=> checkAnswer(index);
+
+        if(q.correct === "trap"){
+            if(ans === "Yes"){
+                btn.id="yesBtn";
+                btn.onclick = finalYes;
+            } else {
+                btn.id="noBtn";
+                btn.onmouseover = dramaticNo;
+            }
+        } else {
+            btn.onclick = ()=> checkAnswer(index);
+        }
+
         answersDiv.appendChild(btn);
     });
 }
 
 function checkAnswer(index){
     const q = questions[current];
-
-    if(q.correct === "all" || index === q.correct){
+    if(index === q.correct){
         confetti({
-            particleCount:100,
+            particleCount:90,
             spread:70,
             origin:{y:0.6},
-            colors:['#ff4d88','#ff99bb','#ffd6e8']
+            colors:['#4caf50','#8bc34a','#c5e1a5']
         });
         document.getElementById("modal").classList.add("active");
     }
@@ -183,47 +207,40 @@ function checkAnswer(index){
 function closeModal(){
     document.getElementById("modal").classList.remove("active");
     current++;
-
-    if(current < questions.length){
-        loadQuestion();
-    } else {
-        showFinalTrap();
-    }
+    loadQuestion();
 }
 
-function showFinalTrap(){
-    const box = document.getElementById("quizBox");
-    box.innerHTML = `
-        <h2 class="title">💘 Final Prescription</h2>
-        <h3>Will you be my forever patient?</h3>
-        <div class="final-buttons">
-            <button id="yesBtn">YES 💖</button>
-            <button id="noBtn">NO 😏</button>
+function dramaticNo(){
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+
+    yesScale += 0.35;
+    yesBtn.style.transform = `scale(${yesScale})`;
+
+    noBtn.style.position = "absolute";
+    noBtn.style.left = Math.random()*250 + "px";
+    noBtn.style.top = Math.random()*120 + "px";
+    noBtn.style.transform = `rotate(${Math.random()*360}deg) scale(${Math.random()*0.6})`;
+}
+
+function finalYes(){
+    document.getElementById("bellSound").play();
+
+    confetti({
+        particleCount:200,
+        spread:120,
+        colors:['#2e7d32','#66bb6a','#dcedc8']
+    });
+
+    document.getElementById("quizBox").innerHTML = `
+        <div class="result-box">
+        🌿 <strong>${yourName}</strong> & <strong>${herName}</strong> 🌿 <br><br>
+        Diagnosis: Eternal Heart Union Approved 💚 <br><br>
+        <em>“स्वस्थस्य स्वास्थ्य रक्षणम् आतुरस्य विकार प्रशमनम्”</em><br>
+        (Preserving the health of the healthy and curing the disease of the ill.)<br><br>
+        Our Hridaya is now in perfect balance. 🌿
         </div>
     `;
-
-    const yesBtn = document.getElementById("yesBtn");
-    const noBtn = document.getElementById("noBtn");
-
-    yesBtn.onclick = ()=>{
-        confetti({
-            particleCount:180,
-            spread:100,
-            colors:['#ff0066','#ff66a3','#ffcce0']
-        });
-        box.innerHTML = "<h2>💖 Diagnosis: Permanently In Love 💖</h2>";
-    };
-
-    noBtn.onmouseover = ()=>{
-        yesScale += 0.35;     // grows faster
-        noShrink -= 0.12;     // shrinks faster
-
-        yesBtn.style.transform = `scale(${yesScale})`;
-        noBtn.style.transform = `scale(${noShrink})`;
-
-        noBtn.style.left = Math.random()*230 + "px";
-        noBtn.style.top = Math.random()*70 + "px";
-    };
 }
 
 loadQuestion();
