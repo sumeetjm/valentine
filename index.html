@@ -16,17 +16,19 @@ body{
     justify-content:center;
     align-items:center;
     min-height:100vh;
+    overflow:hidden;
 }
 
 .quiz-box{
     width:100%;
-    max-width:500px;
+    max-width:520px;
     background:#fff0f5;
     padding:40px 30px;
     border-radius:20px;
     box-shadow:0 25px 80px rgba(255,105,180,0.3);
     text-align:center;
     border:2px solid #ffb6c1;
+    position:relative;
 }
 
 .title{
@@ -42,17 +44,14 @@ body{
 }
 
 .button-container{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    min-height:150px;
+    position:relative;
+    min-height:200px;
 }
 
 button{
     width:200px;
     padding:14px;
-    margin:10px;
+    margin:15px auto;
     border:none;
     border-radius:12px;
     font-size:18px;
@@ -66,28 +65,21 @@ button:hover{
     background:#d81b60;
 }
 
-.custom-alert{
-    position:fixed;
-    bottom:40px;
-    left:50%;
-    transform:translateX(-50%);
-    background:#ff69b4;
-    color:white;
-    padding:14px 25px;
-    border-radius:30px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.25);
-    font-size:15px;
-    opacity:0;
-    transition:all .4s ease;
+#yesBtn{
+    position:relative;
+    z-index:2;
+    transition:transform .3s ease;
 }
 
-.custom-alert.show{
-    opacity:1;
-    bottom:70px;
+#noBtn{
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    transition:all .3s ease;
 }
 
 .result-box{
-    font-size:20px;
+    font-size:22px;
     line-height:1.7;
     color:#d63384;
 }
@@ -102,8 +94,6 @@ button:hover{
     <h3 id="question"></h3>
     <div id="answers" class="button-container"></div>
 </div>
-
-<div class="custom-alert" id="customAlert"></div>
 
 <script>
 
@@ -129,19 +119,7 @@ const questions = [
 ];
 
 let current = 0;
-let yesSize = 18;
-let noSize = 18;
-let noClickCount = 0;
-
-const sureMessages = [
-"Are you sure? 🥺",
-"Really sure? 😢",
-"Think again… 💔",
-"Last chance… 😭",
-"Don’t break my heart 💕",
-"Absolutely sure? 😔",
-"Maybe reconsider? 🥹"
-];
+let yesScale = 1;
 
 function loadQuestion(){
     const q = questions[current];
@@ -159,7 +137,7 @@ function loadQuestion(){
                 btn.onclick = finalYes;
             } else {
                 btn.id="noBtn";
-                btn.onclick = noClicked;
+                btn.onclick = moveNoAndGrowYes;
             }
         } else {
             btn.onclick = ()=> checkAnswer(index);
@@ -179,47 +157,38 @@ function checkAnswer(index){
         current++;
         loadQuestion();
     } else {
-        showCustomAlert("Wrong answer 😜 Try again!");
+        alert("Wrong answer 😜 Try again!");
     }
 }
 
-function noClicked(){
+function moveNoAndGrowYes(){
 
-    showCustomAlert(sureMessages[noClickCount % sureMessages.length]);
-    noClickCount++;
-
-    // YES grows (limit size)
-    yesSize += 6;
-    if(yesSize > 48) yesSize = 48;
+    // Grow YES in all directions
+    yesScale += 0.2;
+    if(yesScale > 3) yesScale = 3;
 
     const yesBtn = document.getElementById("yesBtn");
-    yesBtn.style.fontSize = yesSize + "px";
-    yesBtn.style.width = (200 + noClickCount*15) + "px";
+    yesBtn.style.transform = `scale(${yesScale})`;
 
-    // NO shrinks (limit minimum)
-    noSize -= 3;
-    if(noSize < 12) noSize = 12;
-
+    // Move NO randomly inside container
     const noBtn = document.getElementById("noBtn");
-    noBtn.style.fontSize = noSize + "px";
-    noBtn.style.width = (200 - noClickCount*10) + "px";
-}
+    const container = document.querySelector(".button-container");
 
-function showCustomAlert(message){
-    const alertBox = document.getElementById("customAlert");
-    alertBox.innerText = message;
-    alertBox.classList.add("show");
+    const maxX = container.offsetWidth - 200;
+    const maxY = container.offsetHeight - 60;
 
-    setTimeout(()=>{
-        alertBox.classList.remove("show");
-    },1500);
+    const randomX = Math.random() * maxX;
+    const randomY = Math.random() * maxY;
+
+    noBtn.style.left = randomX + "px";
+    noBtn.style.top = randomY + "px";
 }
 
 function finalYes(){
 
     confetti({
-        particleCount:300,
-        spread:120
+        particleCount:350,
+        spread:130
     });
 
     document.getElementById("quizBox").innerHTML = `
