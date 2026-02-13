@@ -2,311 +2,229 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>WhatsApp Valentine 💚</title>
+<title>Doctor Love Quiz</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0b141a;
-  color: #111;
+body{
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg,#f5faff,#e3f2fd);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    overflow:hidden;
 }
 
-.chat {
-  max-width: 420px;
-  margin: auto;
-  background: #e5ddd5;
-  min-height: 100vh;
-  padding: 10px;
-  box-sizing: border-box;
+.container{
+    width:420px;
+    background:white;
+    padding:30px;
+    border-radius:20px;
+    box-shadow:0 15px 40px rgba(0,0,0,0.1);
+    text-align:center;
+    position:relative;
+    transition:opacity .5s ease, transform .5s ease;
 }
 
-.header {
-  background: #075e54;
-  color: white;
-  padding: 12px;
-  font-size: 18px;
-  font-weight: bold;
-  position: sticky;
-  top: 0;
+h1{
+    color:#2E86C1;
+    margin-bottom:10px;
 }
 
-.bubble {
-  max-width: 80%;
-  padding: 10px 14px;
-  margin: 8px 0;
-  border-radius: 10px;
-  line-height: 1.4;
-  animation: fadeIn 0.3s ease;
+.ecg{
+    height:40px;
+    background:linear-gradient(to right,transparent 0%, #2E86C1 50%, transparent 100%);
+    animation: pulse 1.5s infinite;
 }
 
-.from-me {
-  background: #dcf8c6;
-  margin-left: auto;
-  border-bottom-right-radius: 2px;
+@keyframes pulse{
+    0%{opacity:0.3}
+    50%{opacity:1}
+    100%{opacity:0.3}
 }
 
-.from-them {
-  background: white;
-  margin-right: auto;
-  border-bottom-left-radius: 2px;
+button{
+    display:block;
+    width:100%;
+    margin:10px 0;
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    font-size:16px;
+    cursor:pointer;
+    background:#2E86C1;
+    color:white;
+    transition:all .3s ease;
 }
 
-.options {
-  margin-top: 10px;
+button:hover{
+    transform:scale(1.05);
 }
 
-.option {
-  display: block;
-  width: 100%;
-  background: #25d366;
-  border: none;
-  color: white;
-  padding: 12px;
-  margin: 6px 0;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.2s;
+.custom-modal{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.4);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    visibility:hidden;
+    opacity:0;
+    transition:all .3s ease;
 }
 
-.option:hover {
-  transform: scale(1.02);
+.modal-card{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    text-align:center;
+    width:300px;
+    transform:scale(0.8);
+    transition:all .3s ease;
 }
 
-#yesBtn {
-  font-size: 18px;
+.custom-modal.active{
+    visibility:visible;
+    opacity:1;
 }
 
-#noBtn {
-  font-size: 16px;
+.custom-modal.active .modal-card{
+    transform:scale(1);
 }
 
-canvas {
-  position: fixed;
-  top: 0; left: 0;
-  pointer-events: none;
+.final-buttons{
+    position:relative;
+    height:120px;
 }
 
-.heart {
-  position: fixed;
-  bottom: -20px;
-  font-size: 22px;
-  animation: floatUp 5s linear infinite;
+#yesBtn{
+    background:#27AE60;
 }
 
-@keyframes floatUp {
-  to { transform: translateY(-110vh); opacity: 0; }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Custom Alert */
-#customAlert {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
-
-.alert-box {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  text-align: center;
-}
-
-.alert-box button {
-  margin-top: 12px;
-  background: #25d366;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 16px;
+#noBtn{
+    background:#E74C3C;
+    position:absolute;
+    left:0;
 }
 </style>
 </head>
 
 <body>
 
-<audio autoplay loop>
-  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_9f45c9b1d2.mp3?filename=romantic-ambient-112191.mp3" type="audio/mpeg">
-</audio>
-
-<canvas id="confetti"></canvas>
-
-<div class="chat">
-  <div class="header">💚 My Valentine</div>
-  <div id="messages"></div>
-  <div class="options" id="options"></div>
+<div class="container" id="quizBox">
+    <h1>🩺 Love Diagnosis</h1>
+    <div class="ecg"></div>
+    <h3 id="question"></h3>
+    <div id="answers"></div>
 </div>
 
-<!-- Custom Alert -->
-<div id="customAlert">
-  <div class="alert-box">
-    <div id="alertText"></div>
-    <button onclick="closeAlert()">OK 💖</button>
-  </div>
+<div class="custom-modal" id="modal">
+    <div class="modal-card">
+        <h2>💖 Correct Diagnosis!</h2>
+        <p>Your heart is perfectly healthy.</p>
+        <button onclick="closeModal()">Continue</button>
+    </div>
 </div>
 
 <script>
-const questions = [
-  { q:"Where did we hold hands first? 🤝❤️",
-    options:["Goregaon","Malad","Dombivli","Seawoods"], correct:2 },
-  { q:"What was I wearing when I came to your home first time? 🏠❤️",
-    options:["Grey shirt","White shirt","Blue shirt","Black shirt"], correct:1 },
-  { q:"When did we kiss first? 💋❤️",
-    options:["26 July 2025","24 June 2025","24 July 2025","11 April 2025"], correct:2 }
+const questions=[
+{
+    question:"What beats faster when I see you?",
+    answers:["Heart","Brain","Liver"],
+    correct:0
+},
+{
+    question:"What is the cure for loneliness?",
+    answers:["Medicine","You","Surgery"],
+    correct:1
+},
+{
+    question:"Final Diagnosis?",
+    answers:["Love","Forever","Together"],
+    correct:"all"
+}
 ];
 
-let current = 0;
+let current=0;
+let yesScale=1;
+let clickCount=0;
 
-const msgEl = document.getElementById("messages");
-const optEl = document.getElementById("options");
-
-/* Alerts */
-function showAlert(msg){
-  document.getElementById("alertText").innerText = msg;
-  document.getElementById("customAlert").style.display="flex";
-}
-function closeAlert(){
-  document.getElementById("customAlert").style.display="none";
-}
-
-/* Add message bubble */
-function addBubble(text, fromMe=false){
-  const div = document.createElement("div");
-  div.className = "bubble " + (fromMe ? "from-me":"from-them");
-  div.innerText = text;
-  msgEl.appendChild(div);
-  msgEl.scrollTop = msgEl.scrollHeight;
-}
-
-/* Load Question */
 function loadQuestion(){
-  const q = questions[current];
-  addBubble(q.q, false);
-  optEl.innerHTML = "";
-  q.options.forEach((opt,i)=>{
-    const btn=document.createElement("button");
-    btn.className="option";
-    btn.innerText=opt;
-    btn.onclick=()=>checkAnswer(i,opt);
-    optEl.appendChild(btn);
-  });
+    const q=questions[current];
+    document.getElementById("question").innerText=q.question;
+    const answersDiv=document.getElementById("answers");
+    answersDiv.innerHTML="";
+
+    q.answers.forEach((ans,index)=>{
+        const btn=document.createElement("button");
+        btn.innerText=ans;
+        btn.onclick=()=>checkAnswer(index);
+        answersDiv.appendChild(btn);
+    });
 }
 
-function checkAnswer(i,text){
-  addBubble(text, true);
-  if(i===questions[current].correct){
-    burstConfetti();
+function checkAnswer(index){
+    const q=questions[current];
+
+    if(q.correct==="all" || index===q.correct){
+        launchConfetti();
+        showModal();
+    }
+}
+
+function showModal(){
+    document.getElementById("modal").classList.add("active");
+}
+
+function closeModal(){
+    document.getElementById("modal").classList.remove("active");
     current++;
-    optEl.innerHTML="";
-    setTimeout(()=>{
-      if(current<questions.length) loadQuestion();
-      else startValentineTrap();
-    },500);
-  } else {
-    showAlert("Oops 😜 Try again jaan ❤️");
-  }
+    if(current<questions.length){
+        loadQuestion();
+    }else{
+        showFinalTrap();
+    }
 }
 
-/* Valentine Trap */
-function startValentineTrap(){
-  addBubble("Will you be my Valentine? 🥹❤️", false);
-  optEl.innerHTML=`
-    <button class="option" id="yesBtn">YES 😍</button>
-    <button class="option" id="noBtn">NO 🙈</button>
-  `;
-
-  let yesSize=18, noSize=16;
-  const yesBtn=document.getElementById("yesBtn");
-  const noBtn=document.getElementById("noBtn");
-
-  noBtn.onclick=()=>{
-    showAlert("Are you sure? 😏💔 Think again baby 😘");
-    yesSize+=22;
-    noSize-=4;
-    yesBtn.style.fontSize=yesSize+"px";
-    noBtn.style.fontSize=Math.max(noSize,8)+"px";
-  };
-
-  yesBtn.onclick=()=>{
-    addBubble("YES 😍", true);
-    showWinScreen();
-  };
+function launchConfetti(){
+    confetti({
+        particleCount:100,
+        spread:70,
+        origin:{y:0.6}
+    });
 }
 
-/* Win */
-function showWinScreen(){
-  addBubble("YAYYYY!!! 🎉💖 You are officially my Valentine 😘💍", false);
-  addBubble("I LOVE YOU ❤️❤️❤️", false);
-  startConfettiRain();
-  startHearts();
-}
+function showFinalTrap(){
+    const box=document.getElementById("quizBox");
+    box.innerHTML=`
+        <h1>💘 Prescription</h1>
+        <h3>Will you be my forever patient?</h3>
+        <div class="final-buttons">
+            <button id="yesBtn">YES 💖</button>
+            <button id="noBtn">NO 😏</button>
+        </div>
+    `;
 
-/* Confetti */
-const canvas=document.getElementById("confetti");
-const ctx=canvas.getContext("2d");
-canvas.width=innerWidth; canvas.height=innerHeight;
-let confetti=[];
+    const yesBtn=document.getElementById("yesBtn");
+    const noBtn=document.getElementById("noBtn");
 
-function burstConfetti(){
-  for(let i=0;i<60;i++){
-    confetti.push({x:canvas.width/2,y:canvas.height/2,
-      dx:(Math.random()-0.5)*10,dy:(Math.random()-0.5)*10,
-      r:4,life:50});
-  }
-  requestAnimationFrame(drawBurst);
-}
-function drawBurst(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  confetti=confetti.filter(c=>c.life-- >0);
-  confetti.forEach(c=>{
-    ctx.beginPath();
-    ctx.arc(c.x,c.y,c.r,0,Math.PI*2);
-    ctx.fillStyle="pink";
-    ctx.fill();
-    c.x+=c.dx; c.y+=c.dy; c.dy+=0.3;
-  });
-  if(confetti.length) requestAnimationFrame(drawBurst);
-}
-function startConfettiRain(){
-  for(let i=0;i<200;i++){
-    confetti.push({x:Math.random()*canvas.width,
-      y:-Math.random()*canvas.height,dx:0,dy:4,r:4,life:9999});
-  }
-  requestAnimationFrame(drawRain);
-}
-function drawRain(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  confetti.forEach(c=>{
-    ctx.beginPath();
-    ctx.arc(c.x,c.y,c.r,0,Math.PI*2);
-    ctx.fillStyle="pink";
-    ctx.fill();
-    c.y+=c.dy;
-    if(c.y>canvas.height) c.y=-10;
-  });
-  requestAnimationFrame(drawRain);
-}
+    yesBtn.onclick=()=>{
+        launchConfetti();
+        box.innerHTML="<h1>💖 Diagnosis: Hopelessly In Love 💖</h1>";
+    };
 
-/* Hearts */
-function startHearts(){
-  setInterval(()=>{
-    const h=document.createElement("div");
-    h.className="heart";
-    h.innerText="❤️";
-    h.style.left=Math.random()*100+"vw";
-    document.body.appendChild(h);
-    setTimeout(()=>h.remove(),6000);
-  },250);
+    noBtn.onmouseover=()=>{
+        clickCount++;
+        yesScale+=0.2;
+        yesBtn.style.transform=`scale(${yesScale})`;
+        noBtn.style.transform=`scale(${1 - clickCount*0.1})`;
+        noBtn.style.left=Math.random()*200+"px";
+        noBtn.style.top=Math.random()*50+"px";
+    };
 }
 
 loadQuestion();
