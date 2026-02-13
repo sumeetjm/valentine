@@ -71,8 +71,8 @@ button:hover{
 <body>
 
 <div class="quiz-box" id="quizBox">
-    <h2 class="title">❤️ Love Heart Checkup</h2>
-    <div class="subtitle">Answer honestly… your heart knows ❤️</div>
+    <h2 class="title">❤️ Love Memory Test</h2>
+    <div class="subtitle">Only true love passes all questions 💕</div>
     <h3 id="question"></h3>
     <div id="answers"></div>
 </div>
@@ -84,14 +84,24 @@ const herName = "Natasha";
 
 const questions = [
 {
-    question: "Will you be my Valentine? ❤️",
+    question: "1. Where did we held hands first time?",
+    answers: ["Seawoods", "Thane", "Dombivli", "Dadar"],
+    correct: 2
+},
+{
+    question: "2. Where did we kissed first?",
+    answers: ["Taxi", "Mall", "Auto", "Road"],
+    correct: 0
+},
+{
+    question: "3. Will you be my Valentine? ❤️",
     answers: ["Yes", "No"],
     correct: "trap"
 }
 ];
 
 let current = 0;
-let yesSize = 16;   // starting font size
+let yesSize = 16;
 let noClickCount = 0;
 
 const sureMessages = [
@@ -100,7 +110,7 @@ const sureMessages = [
 "Think again… 💔",
 "Last chance… 😭",
 "Don’t break my heart 💕",
-"Are you absolutely sure? 😔",
+"Absolutely sure? 😔",
 "Maybe reconsider? 🥹"
 ];
 
@@ -110,41 +120,60 @@ function loadQuestion(){
     const answersDiv = document.getElementById("answers");
     answersDiv.innerHTML = "";
 
-    q.answers.forEach((ans)=>{
+    q.answers.forEach((ans,index)=>{
         const btn = document.createElement("button");
         btn.innerText = ans;
 
-        if(ans === "Yes"){
-            btn.id="yesBtn";
-            btn.onclick = finalYes;
+        if(q.correct === "trap"){
+            if(ans === "Yes"){
+                btn.id="yesBtn";
+                btn.onclick = finalYes;
+            } else {
+                btn.id="noBtn";
+                btn.onclick = noClicked;
+            }
         } else {
-            btn.id="noBtn";
-            btn.onclick = noClicked;
+            btn.onclick = ()=> checkAnswer(index);
         }
 
         answersDiv.appendChild(btn);
     });
 }
 
+function checkAnswer(index){
+    const q = questions[current];
+
+    if(index === q.correct){
+        confetti({
+            particleCount:100,
+            spread:70,
+            origin:{y:0.6},
+            colors:['#ff69b4','#ff85c1','#ffc0cb']
+        });
+        current++;
+        loadQuestion();
+    } else {
+        alert("Wrong answer 😜 Try again!");
+    }
+}
+
 function noClicked(){
 
-    // Show different alert message each time
     alert(sureMessages[noClickCount % sureMessages.length]);
 
     noClickCount++;
 
-    // Increase YES button size
     yesSize += 4;
 
     const yesBtn = document.getElementById("yesBtn");
     yesBtn.style.fontSize = yesSize + "px";
-    yesBtn.style.padding = (12 + noClickCount*2) + "px";
+    yesBtn.style.padding = (12 + noClickCount*3) + "px";
 }
 
 function finalYes(){
 
     confetti({
-        particleCount:200,
+        particleCount:250,
         spread:120,
         colors:['#ff4d94','#ff69b4','#ffc0cb']
     });
