@@ -181,23 +181,35 @@ function checkAnswer(index){
 function noClicked(){
 
     showCustomAlert(sureMessages[noClickCount % sureMessages.length]);
-
     noClickCount++;
 
-    // Increase YES size
-    yesSize += 4;
     const yesBtn = document.getElementById("yesBtn");
-    yesBtn.style.fontSize = yesSize + "px";
-    yesBtn.style.padding = (12 + noClickCount*3) + "px";
+    const noBtn = document.getElementById("noBtn");
 
-    // Decrease NO size
+    /* ✅ SCALE YES BUTTON (all directions) */
+    let currentScale = parseFloat(yesBtn.getAttribute("data-scale")) || 1;
+    currentScale += 0.15;
+    yesBtn.style.transform = `scale(${currentScale})`;
+    yesBtn.style.transition = "transform 0.3s ease";
+    yesBtn.setAttribute("data-scale", currentScale);
+
+    /* ✅ SHRINK NO BUTTON (with minimum limit) */
     noSize -= 2;
     if(noSize < 10) noSize = 10;
-
-    const noBtn = document.getElementById("noBtn");
     noBtn.style.fontSize = noSize + "px";
-    noBtn.style.padding = (12 - noClickCount) + "px";
+
+    /* ✅ MOVE NO BUTTON RANDOMLY */
+    noBtn.style.position = "relative";
+
+    const maxX = 120; // horizontal movement range
+    const maxY = 80;  // vertical movement range
+
+    const randomX = (Math.random() - 0.5) * maxX;
+    const randomY = (Math.random() - 0.5) * maxY;
+
+    noBtn.style.transform = `translate(${randomX}px, ${randomY}px)`;
 }
+
 
 function showCustomAlert(message){
     const alertBox = document.getElementById("customAlert");
