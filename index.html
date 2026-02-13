@@ -84,6 +84,31 @@ button:hover{
     line-height:1.6;
     color:#d63384;
 }
+
+    /* YES Pulse Animation */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+.pulse {
+    animation: pulse 0.6s ease;
+}
+
+/* Screen Shake */
+@keyframes shake {
+    0% { transform: translate(0,0); }
+    25% { transform: translate(-10px, 5px); }
+    50% { transform: translate(10px, -5px); }
+    75% { transform: translate(-8px, 4px); }
+    100% { transform: translate(0,0); }
+}
+
+.shake {
+    animation: shake 0.5s ease;
+}
+
 </style>
 </head>
 
@@ -97,7 +122,9 @@ button:hover{
 </div>
 
 <div class="custom-alert" id="customAlert"></div>
-
+<audio id="bgMusic" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
+</audio>
 <script>
 
 const yourName = "Sumeet";
@@ -180,41 +207,55 @@ function checkAnswer(index){
 
 function noClicked(){
 
-    showCustomAlert(sureMessages[noClickCount % sureMessages.length]);
-    noClickCount++;
-
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
+    const quizBox = document.getElementById("quizBox");
+    const music = document.getElementById("bgMusic");
 
-    /* ===== YES SCALE UP ===== */
+    showCustomAlert(sureMessages[noClickCount % sureMessages.length]);
+
+    noClickCount++;
+
+    /* 🔥 Start music on first interaction */
+    if(noClickCount === 1){
+        music.play();
+    }
+
+    /* 💖 YES SCALE + PULSE */
     let yesScale = parseFloat(yesBtn.dataset.scale) || 1;
     yesScale += 0.15;
-    yesBtn.style.transform = `scale(${yesScale})`;
-    yesBtn.style.transition = "transform 0.3s ease";
     yesBtn.dataset.scale = yesScale;
+    yesBtn.style.transform = `scale(${yesScale})`;
 
+    yesBtn.classList.add("pulse");
+    setTimeout(()=> yesBtn.classList.remove("pulse"), 600);
 
-    /* ===== NO SCALE DOWN ===== */
+    /* 😈 NO SCALE DOWN */
     let noScale = parseFloat(noBtn.dataset.scale) || 1;
     noScale -= 0.08;
-
-    if(noScale < 0.4) noScale = 0.4;  // minimum size
-
-    noBtn.style.transform = `scale(${noScale})`;
-    noBtn.style.transition = "transform 0.3s ease";
+    if(noScale < 0.4) noScale = 0.4;
     noBtn.dataset.scale = noScale;
 
+    /* 🏃 RANDOM MOVE */
+    const randomX = (Math.random() - 0.5) * 150;
+    const randomY = (Math.random() - 0.5) * 100;
 
-    /* ===== MOVE NO RANDOMLY ===== */
-    const maxX = 120;
-    const maxY = 80;
+    noBtn.style.transform = `translate(${randomX}px, ${randomY}px) scale(${noScale})`;
+    noBtn.style.transition = "transform 0.3s ease";
 
-    const randomX = (Math.random() - 0.5) * maxX;
-    const randomY = (Math.random() - 0.5) * maxY;
+    /* 💥 SHAKE SCREEN ON 5TH CLICK */
+    if(noClickCount === 5){
+        quizBox.classList.add("shake");
+        setTimeout(()=> quizBox.classList.remove("shake"), 500);
+    }
 
-    noBtn.style.position = "relative";
-    noBtn.style.left = randomX + "px";
-    noBtn.style.top = randomY + "px";
+    /* 🚫 DISABLE NO AFTER 7 CLICKS */
+    if(noClickCount >= 7){
+        noBtn.disabled = true;
+        noBtn.innerText = "Impossible 😈";
+        noBtn.style.opacity = "0.6";
+        noBtn.style.cursor = "not-allowed";
+    }
 }
 
 
