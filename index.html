@@ -17,7 +17,6 @@ body{
     align-items:center;
     min-height:100vh;
     padding:15px;
-    overflow:hidden;
 }
 
 .quiz-box{
@@ -29,7 +28,6 @@ body{
     box-shadow:0 20px 60px rgba(255,105,180,0.3);
     text-align:center;
     border:2px solid #ffb6c1;
-    position:relative; /* important */
 }
 
 .title{
@@ -46,54 +44,20 @@ body{
 
 button{
     display:block;
-    width:180px;              /* fixed width for both */
+    width:180px;
     margin:10px auto;
-    padding:10px;
+    padding:12px;
     border:none;
     border-radius:10px;
-    font-size:14px;
+    font-size:16px;
     cursor:pointer;
     background:#e91e63;
     color:white;
-    transition:background .3s ease;
+    transition:all .3s ease;
 }
 
 button:hover{
     background:#d81b60;
-}
-
-#noBtn{
-    position:absolute;
-}
-
-.modal{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,0.35);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    visibility:hidden;
-    opacity:0;
-    transition:.3s ease;
-}
-
-.modal-card{
-    background:#fff0f5;
-    padding:25px;
-    border-radius:15px;
-    text-align:center;
-    width:85%;
-    max-width:300px;
-    border:2px solid #ffb6c1;
-}
-
-.modal.active{
-    visibility:visible;
-    opacity:1;
 }
 
 .result-box{
@@ -113,18 +77,6 @@ button:hover{
     <div id="answers"></div>
 </div>
 
-<div class="modal" id="modal">
-    <div class="modal-card">
-        <h3>💖 Correct Answer!</h3>
-        <p>Your love memory is strong 🥰</p>
-        <button onclick="closeModal()">Continue</button>
-    </div>
-</div>
-
-<audio id="bellSound">
-<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3c74c7c0e5.mp3?filename=temple-bell-6927.mp3" type="audio/mpeg">
-</audio>
-
 <script>
 
 const yourName = "Sumeet";
@@ -132,23 +84,25 @@ const herName = "Natasha";
 
 const questions = [
 {
-    question: "1. Where did we held hands first time?",
-    answers: ["Seawoods", "Thane", "Dombivli", "Dadar"],
-    correct: 2
-},
-{
-    question: "2. Where did we kissed first?",
-    answers: ["Taxi", "Mall", "Auto", "Road"],
-    correct: 0
-},
-{
-    question: "3. Will you be my Valentine? ❤️",
+    question: "Will you be my Valentine? ❤️",
     answers: ["Yes", "No"],
     correct: "trap"
 }
 ];
 
 let current = 0;
+let yesSize = 16;   // starting font size
+let noClickCount = 0;
+
+const sureMessages = [
+"Are you sure? 🥺",
+"Really sure? 😢",
+"Think again… 💔",
+"Last chance… 😭",
+"Don’t break my heart 💕",
+"Are you absolutely sure? 😔",
+"Maybe reconsider? 🥹"
+];
 
 function loadQuestion(){
     const q = questions[current];
@@ -156,59 +110,38 @@ function loadQuestion(){
     const answersDiv = document.getElementById("answers");
     answersDiv.innerHTML = "";
 
-    q.answers.forEach((ans,index)=>{
+    q.answers.forEach((ans)=>{
         const btn = document.createElement("button");
         btn.innerText = ans;
 
-        if(q.correct === "trap"){
-            if(ans === "Yes"){
-                btn.onclick = finalYes;
-            } else {
-                btn.id="noBtn";
-                btn.onclick = dramaticNo;   // works on mobile too
-            }
+        if(ans === "Yes"){
+            btn.id="yesBtn";
+            btn.onclick = finalYes;
         } else {
-            btn.onclick = ()=> checkAnswer(index);
+            btn.id="noBtn";
+            btn.onclick = noClicked;
         }
 
         answersDiv.appendChild(btn);
     });
 }
 
-function checkAnswer(index){
-    const q = questions[current];
-    if(index === q.correct){
-        confetti({
-            particleCount:90,
-            spread:70,
-            origin:{y:0.6},
-            colors:['#ff69b4','#ff85c1','#ffc0cb']
-        });
-        document.getElementById("modal").classList.add("active");
-    }
-}
+function noClicked(){
 
-function closeModal(){
-    document.getElementById("modal").classList.remove("active");
-    current++;
-    loadQuestion();
-}
+    // Show different alert message each time
+    alert(sureMessages[noClickCount % sureMessages.length]);
 
-function dramaticNo(){
-    const noBtn = document.getElementById("noBtn");
+    noClickCount++;
 
-    const maxWidth = window.innerWidth - 200;
-    const maxHeight = window.innerHeight - 200;
+    // Increase YES button size
+    yesSize += 4;
 
-    const randomX = Math.random() * maxWidth;
-    const randomY = Math.random() * maxHeight;
-
-    noBtn.style.left = randomX + "px";
-    noBtn.style.top = randomY + "px";
+    const yesBtn = document.getElementById("yesBtn");
+    yesBtn.style.fontSize = yesSize + "px";
+    yesBtn.style.padding = (12 + noClickCount*2) + "px";
 }
 
 function finalYes(){
-    document.getElementById("bellSound").play();
 
     confetti({
         particleCount:200,
@@ -228,5 +161,6 @@ function finalYes(){
 loadQuestion();
 
 </script>
+
 </body>
 </html>
